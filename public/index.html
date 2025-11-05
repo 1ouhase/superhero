@@ -3,11 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Superhero Database</title>
+    <style>
+        .hero-card {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+            display: inline-block;
+        }
+        nav {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>
-        hello
-    </h1>
+    <nav>
+        <a href="#" onclick="showAllHeroes()">All Heroes</a> |
+        <a href="#" onclick="showFavorites()">Favorites</a>
+    </nav>
+
+    <div id="search-section">
+        <input type="text" id="heroId" placeholder="Enter Hero ID">
+        <button onclick="searchHero()">Search Hero</button>
+    </div>
+
+    <div id="add-favorite-section" style="display: none;">
+        <h2>Add to Favorites</h2>
+        <input type="text" id="favHeroId" placeholder="Hero ID">
+        <input type="text" id="favNote" placeholder="Add a note">
+        <button onclick="addFavorite()">Add to Favorites</button>
+    </div>
+
+    <div id="content"></div>
+
+    <script>
+        async function showAllHeroes() {
+            try {
+                const response = await fetch('/superhero');
+                const heroes = await response.json();
+                displayHeroes(heroes);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function searchHero() {
+            const heroId = document.getElementById('heroId').value;
+            try {
+                const response = await fetch(`/superhero/${heroId}`);
+                const hero = await response.json();
+                displayHeroes([hero]);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function showFavorites() {
+            try {
+                const response = await fetch('/favorites');
+                const favorites = await response.json();
+                displayFavorites(favorites);
+                document.getElementById('add-favorite-section').style.display = 'block';
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function addFavorite() {
+            const heroId = document.getElementById('favHeroId').value;
+            const note = document.getElementById('favNote').value;
+            try {
+                const response = await fetch('/favorites', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ heroId, note })
+                });
+                if (response.ok) {
+                    showFavorites();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function displayHeroes(heroes) {
+            const content = document.getElementById('content');
+            content.innerHTML = '';
+            document.getElementById('add-favorite-section').style.display = 'none';
+            
+            heroes.forEach(hero => {
+                const heroCard = document.createElement('div');
+                heroCard.className = 'hero-card';
+                heroCard.innerHTML = `
+                    <h3>${hero.name || 'Unknown'}</h3>
+                    <p>ID: ${hero.id}</p>
+                    <p>Powers: ${hero.powers || 'None'}</p>
+                `;
+                content.appendChild(heroCard);
+            });
+        }
+
+        function displayFavorites(favorites) {
+            const content = document.getElementById('content');
+            content.innerHTML = '';
+            
+            favorites.forEach(fav => {
+                const favCard = document.createElement('div');
+                favCard.className = 'hero-card';
+                favCard.innerHTML = `
+                    <h3>Hero ID: ${fav.heroId}</h3>
+                    <p>Note: ${fav.note}</p>
+                `;
+                content.appendChild(favCard);
+            });
+        }
+
+        showAllHeroes();
+    </script>
 </body>
-</html>
+</html></div>

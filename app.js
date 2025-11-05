@@ -13,7 +13,7 @@ const port = 3000;
 
 app.use(morgan('dev'));
 
-app.use(ratelimiter);
+app.use(ratelimiter.rateLimiter);
 
 app.use(express.json());
 
@@ -22,7 +22,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/superhero', superheroRoutes);
 app.use('/favorites', favoriteRoutes);
 
-app.use(errorHandler);
+app.use(errorHandler)
 
 app.listen(port, () => {
     console.log(`server kører på http://localhost:${port}`);
