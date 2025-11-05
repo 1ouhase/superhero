@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const favoriteController = require('../controllers/favoriteController');
-const validation = require('')
+const validation = require('../middlewares/favoriteValidation');
 
 router.post('/', validation, favoriteController.createFavorite);
 
